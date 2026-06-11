@@ -32,7 +32,7 @@ export function Header() {
               <Zap className="h-4 w-4 text-primary" />
             </div>
             <span className="text-lg font-bold tracking-tight font-heading">
-              Sports<span className="text-primary/80">RC</span>
+              Sports<span className="text-primary/80">FC</span>
             </span>
           </Link>
 
