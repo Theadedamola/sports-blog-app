@@ -165,7 +165,7 @@ export function MatchDetailClient({ match }: MatchDetailClientProps) {
                             initial={{ opacity: 0, x: -8 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: i * 0.05 }}
-                            className="flex items-center justify-between p-3 rounded bg-white/[0.01] hover:bg-white/[0.03] transition-colors"
+                            className="flex items-center justify-between p-3 rounded bg-white/1 hover:bg-white/3 transition-colors"
                           >
                             <span className="text-xs text-muted-foreground w-20">{record.date}</span>
                             <span className="text-sm font-medium flex-1 text-right pr-3 truncate">
@@ -175,7 +175,7 @@ export function MatchDetailClient({ match }: MatchDetailClientProps) {
                               className={`text-sm font-bold tabular-nums px-3 py-1 rounded ${
                                 isDraw
                                   ? "text-primary bg-primary/10"
-                                  : "text-foreground bg-white/[0.05]"
+                                  : "text-foreground bg-white/5"
                               }`}
                             >
                               {record.homeScore} - {record.awayScore}
@@ -247,7 +247,7 @@ export function MatchDetailClient({ match }: MatchDetailClientProps) {
                           {form.map((entry, i) => (
                             <div
                               key={i}
-                              className="flex items-center justify-between text-xs py-1 px-2 rounded bg-white/[0.01]"
+                              className="flex items-center justify-between text-xs py-1 px-2 rounded bg-white/1"
                             >
                               <span className="text-muted-foreground">{entry.date}</span>
                               <span className="font-medium">vs {entry.opponent}</span>
@@ -273,7 +273,7 @@ export function MatchDetailClient({ match }: MatchDetailClientProps) {
             )}
           </Tabs>
         ) : (
-          <div className="glass-card p-12 text-center border border-border/50 bg-white/[0.01]">
+          <div className="glass-card p-12 text-center border border-border/50 bg-white/1">
             <BarChart3 className="h-8 w-8 mx-auto text-muted-foreground/60 mb-3" />
             <p className="text-sm font-semibold font-heading uppercase tracking-wider text-muted-foreground">Match details not available</p>
             <p className="text-xs text-muted-foreground/80 max-w-[360px] mx-auto mt-1">

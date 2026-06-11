@@ -101,10 +101,10 @@ ${matchesContext}`;
 
     // ── Resilient Fallback Model Retries ──
     const modelsToTry = [
-      "google/gemini-2.0-flash-001",
-      "google/gemini-2.0-flash-lite-preview-02-05:free",
-      "meta-llama/llama-3.2-3b-instruct:free",
-      "qwen/qwen-2.5-72b-instruct:free"
+      "openrouter/free",
+      "z-ai/glm-4.5-air:free",
+      "stepfun/step-3.5-flash:free",
+      "tngtech/deepseek-r1t-chimera:free",
     ];
 
     let content = "";
@@ -119,7 +119,7 @@ ${matchesContext}`;
             Authorization: `Bearer ${apiKey}`,
             "Content-Type": "application/json",
             "HTTP-Referer": "http://localhost:3000",
-            "X-Title": "SportsRC AI",
+            "X-Title": "SportsFC AI",
           },
           body: JSON.stringify({
             model,
@@ -167,7 +167,7 @@ ${matchesContext}`;
       console.warn("[AI Chat] All OpenRouter models were rate-limited or failed. Falling back to dynamic generator.", lastError);
       return NextResponse.json(
         {
-          content: generateFallbackResponse(messages, matches) + `\n\n*(Note: Custom live model query was temporarily rate-limited; showing dynamic engine results).*`,
+          content: generateFallbackResponse(messages, matches, blogContext),
         },
         { status: 200 }
       );
@@ -247,8 +247,8 @@ You can ask me to break down St Etienne's 4-5-1 formations, define half-space ov
   ) {
     const live = matches.filter((m) => m.status === "live" || m.status === "halftime");
     const upcoming = matches.filter((m) => m.status === "scheduled");
-
-    let responseText = `Here is today's match schedule on **SportsRC**:\n\n`;
+    const fallbackMatches = live.length === 0 && upcoming.length === 0 ? matches.slice(0, 5) : [];
+    let responseText = `Here is today's match schedule on **SportsFC**:\n\n`;
 
     if (live.length > 0) {
       responseText += `🔴 **Live Now:**\n`;
@@ -265,10 +265,29 @@ You can ask me to break down St Etienne's 4-5-1 formations, define half-space ov
       });
     }
 
-    return responseText + `\n*Note: For detailed interactive tactical analyses, please ensure your \`OPENROUTER_API_KEY\` is configured.*`;
+    if (fallbackMatches.length > 0) {
+      responseText += `📋 **All Available Matches:**\n`;
+      fallbackMatches.forEach((m) => {
+        const status =
+          m.status === "finished"
+            ? `FT (${m.score.home}-${m.score.away})`
+            : m.status === "scheduled"
+              ? `starts at ${new Date(m.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+              : m.status === "live" || m.status === "halftime"
+                ? `${m.status.toUpperCase()} (${m.minute}')`
+                : m.status.replace(/_/g, " ");
+        responseText += `- **${m.homeTeam.name} vs ${m.awayTeam.name}** (${m.league.name}) - ${status}\n`;
+      });
+    }
+
+    if (live.length === 0 && upcoming.length === 0 && fallbackMatches.length === 0) {
+      return `Here is today's match schedule on **SportsFC**:\n\nNo live, upcoming, or recent football matches are available right now.`;
+    }
+
+    return responseText.trimEnd();
   }
 
-  return `I'm SportsRC AI — your expert tournament assistant! 🤖⚽
+  return `I'm SportsFC AI, your expert tournament assistant! 🤖⚽
 
 I am currently tracking **${matches.length} matches** across various leagues.
 

@@ -41,7 +41,7 @@ export function ScoreBoard({ match, size = "md", className }: ScoreBoardProps) {
       {/* Score */}
       <div className="flex flex-col items-center gap-1">
         {isLive && <LiveBadge size="sm" />}
-        <div className="flex items-center gap-3">
+        {/* <div className="flex items-center gap-3">
           <span className={cn("font-black tabular-nums", s.score, isLive && "text-neon text-glow-neon")}>
             {match.score.home}
           </span>
@@ -51,7 +51,7 @@ export function ScoreBoard({ match, size = "md", className }: ScoreBoardProps) {
           <span className={cn("font-black tabular-nums", s.score, isLive && "text-neon text-glow-neon")}>
             {match.score.away}
           </span>
-        </div>
+        </div> */}
         {isLive && match.minute && (
           <span className="text-xs font-mono text-neon/80">{match.minute}&apos;</span>
         )}

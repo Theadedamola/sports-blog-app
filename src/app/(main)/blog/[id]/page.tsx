@@ -1,4 +1,4 @@
-import { BLOG_POSTS } from "@/lib/api/blog-data";
+import { fetchBlogPostById } from "@/lib/api/blog-fetcher";
 import { BlogDetailClient } from "./BlogDetailClient"
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -9,7 +9,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const post = BLOG_POSTS.find((p) => p.id === id);
+  const post = await fetchBlogPostById(id);
   if (!post) return { title: "Article Not Found" };
 
   return {
@@ -20,7 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogDetailPage({ params }: Props) {
   const { id } = await params;
-  const post = BLOG_POSTS.find((p) => p.id === id);
+  const post = await fetchBlogPostById(id);
 
-  return <BlogDetailClient initialPost={post || null} postId={id} />;
+  return <BlogDetailClient initialPost={post} postId={id} />;
 }
+

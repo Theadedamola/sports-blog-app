@@ -10,7 +10,7 @@ export function Footer() {
         <div className="mb-10">
           <Link href="/" className="inline-block">
             <h2 className="text-4xl font-bold font-heading text-foreground tracking-tight leading-none">
-              Sports<span className="text-primary/70 font-light">RC</span>
+              Sports<span className="text-primary/70 font-light">FC</span>
             </h2>
           </Link>
         </div>
@@ -52,7 +52,7 @@ export function Footer() {
             href="https://instagram.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-foreground text-muted-foreground/80 transition-colors p-2.5 rounded-full border border-white/[0.06] bg-white/[0.02]"
+            className="hover:text-foreground text-muted-foreground/80 transition-colors p-2.5 rounded-full border border-white/6 bg-white/2"
             aria-label="Instagram"
           >
             <svg
@@ -80,7 +80,7 @@ export function Footer() {
 
         {/* Legal Text */}
         <div className="text-[10px] text-muted-foreground/40 font-light max-w-xl mx-auto leading-relaxed pt-4 border-t border-primary/5">
-          <p>SportsRC Ltd | Registered in England and Wales | Site by SportsRC</p>
+          <p>SportsFC Ltd | Registered in England and Wales | Site by SportsFC</p>
         </div>
       </div>
     </footer>

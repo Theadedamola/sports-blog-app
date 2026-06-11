@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { BlogPost } from "@/lib/api/blog-data";
 import type { Match } from "@/types/api";
-import { Search, Calendar, Clock, ArrowRight, BookOpen, Radio } from "lucide-react";
+import { Search, BookOpen } from "lucide-react";
 import Link from "next/link";
 
 interface BlogClientProps {
@@ -28,6 +28,17 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
+const matchDateFormatter = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+function formatMatchDate(startTime: string) {
+  return matchDateFormatter.format(new Date(startTime));
+}
+
 export function BlogClient({ posts, liveMatches, scheduledMatches }: BlogClientProps) {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
@@ -46,17 +57,50 @@ export function BlogClient({ posts, liveMatches, scheduledMatches }: BlogClientP
   const [allPosts, setAllPosts] = useState<BlogPost[]>(posts);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("custom_blog_posts");
-      if (stored) {
-        const custom = JSON.parse(stored) as BlogPost[];
-        const uniqueCustom = custom.filter((cp) => !posts.some((p) => p.id === cp.id));
-        setAllPosts([...uniqueCustom, ...posts]);
+    const syncPosts = async () => {
+      try {
+        const response = await fetch("/api/blog");
+        if (response.ok) {
+          const data = await response.json();
+          const dbPosts = data.posts || [];
+          
+          // Merge with localStorage custom posts for fallback support
+          const stored = localStorage.getItem("custom_blog_posts");
+          let combined = [...dbPosts];
+          if (stored) {
+            const custom = JSON.parse(stored) as BlogPost[];
+            const uniqueCustom = custom.filter((cp) => !combined.some((p) => p.id === cp.id));
+            combined = [...uniqueCustom, ...combined];
+          }
+          setAllPosts(combined);
+        } else {
+          loadFallbackLocalStorage();
+        }
+      } catch (e) {
+        console.error("Error syncing blog posts:", e);
+        loadFallbackLocalStorage();
       }
-    } catch (e) {
-      console.error("Error loading custom blog posts", e);
-    }
+    };
+
+    const loadFallbackLocalStorage = () => {
+      try {
+        const stored = localStorage.getItem("custom_blog_posts");
+        if (stored) {
+          const custom = JSON.parse(stored) as BlogPost[];
+          const uniqueCustom = custom.filter((cp) => !posts.some((p) => p.id === cp.id));
+          setAllPosts([...uniqueCustom, ...posts]);
+        } else {
+          setAllPosts(posts);
+        }
+      } catch (e) {
+        console.error("Error loading custom blog posts fallback:", e);
+        setAllPosts(posts);
+      }
+    };
+
+    syncPosts();
   }, [posts]);
+
 
   const filteredPosts = allPosts.filter((post) => {
     const matchesSearch =
@@ -70,20 +114,20 @@ export function BlogClient({ posts, liveMatches, scheduledMatches }: BlogClientP
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 pb-16 min-h-screen text-foreground">
       {/* ── Stadium Header Banner ───────────────── */}
-      <div className="relative rounded-2xl overflow-hidden mb-12 min-h-[220px] flex items-center border border-white/[0.06] bg-black/40">
+      <div className="relative rounded-2xl overflow-hidden mb-12 min-h-[220px] flex items-center border border-white/6 bg-black/40">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-luminosity"
           style={{ backgroundImage: `url('/stadium_hero.png')` }}
         />
         {/* Dark radial overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent z-10" />
+        <div className="absolute inset-0 bg-linear-to-r from-background via-background/60 to-transparent z-10" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(252,241,218,0.03),transparent_70%)] z-10" />
         
         <div className="relative z-20 px-6 py-8 md:px-10 md:py-12 max-w-2xl text-left">
           <div className="flex items-center gap-2 mb-3">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
             <span className="text-[10px] font-bold tracking-widest uppercase text-primary font-heading">
-              SportsRC Desk
+              SportsFC Desk
             </span>
           </div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading mb-3 tracking-tight">
@@ -140,7 +184,7 @@ export function BlogClient({ posts, liveMatches, scheduledMatches }: BlogClientP
               <Link href={`/blog/${post.id}`} className="group block">
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
                   {/* Left: cover Image */}
-                  <div className="w-full md:w-[45%] relative aspect-video md:aspect-[1.4] overflow-hidden rounded-[20px] border border-white/[0.04] shadow-2xl bg-black/30">
+                  <div className="w-full md:w-[45%] relative aspect-video md:aspect-[1.4] overflow-hidden rounded-[20px] border border-white/4 shadow-2xl bg-black/30">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={post.coverImage}
@@ -182,7 +226,7 @@ export function BlogClient({ posts, liveMatches, scheduledMatches }: BlogClientP
 
       {/* ── Matchday Featured Slideshow Banner ────────────────── */}
       {featuredMatches.length > 0 ? (
-        <div className="relative rounded-[20px] overflow-hidden min-h-[220px] md:min-h-[265px] border border-white/[0.06] bg-black/40 mt-24">
+        <div className="relative rounded-[20px] overflow-hidden min-h-[220px] md:min-h-[265px] border border-white/6 bg-black/40 mt-24">
           <AnimatePresence mode="wait">
             {(() => {
               const match = featuredMatches[currentSlide];
@@ -204,7 +248,7 @@ export function BlogClient({ posts, liveMatches, scheduledMatches }: BlogClientP
                       style={{ backgroundImage: `url('${bannerBg}')` }}
                     />
                     {/* Rich dark vignette overlay so the text is crystal clear */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent z-10" />
+                    <div className="absolute inset-0 bg-linear-to-r from-black/85 via-black/45 to-transparent z-10" />
                     
                     <div className="relative z-20 px-8 py-8 md:px-12 md:py-10 text-left max-w-2xl">
                       <div className="flex items-center gap-2 mb-4">
@@ -230,7 +274,7 @@ export function BlogClient({ posts, liveMatches, scheduledMatches }: BlogClientP
                       </h3>
                       
                       <p className="text-xs md:text-sm text-muted-foreground/90 font-light mb-6">
-                        {match.league.name} • {match.league.country} • {new Date(match.startTime).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}
+                        {match.league.name} • {match.league.country} • {formatMatchDate(match.startTime)}
                       </p>
 
                       <div>
@@ -264,16 +308,16 @@ export function BlogClient({ posts, liveMatches, scheduledMatches }: BlogClientP
           )}
         </div>
       ) : (
-        <div className="mt-24 relative rounded-[20px] overflow-hidden min-h-[220px] md:min-h-[260px] flex items-center border border-white/[0.06] bg-black/40">
+        <div className="mt-24 relative rounded-[20px] overflow-hidden min-h-[220px] md:min-h-[260px] flex items-center border border-white/6 bg-black/40">
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
             style={{ backgroundImage: `url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop')` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent z-10" />
+          <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/45 to-transparent z-10" />
           
           <div className="relative z-20 px-8 py-8 md:px-12 md:py-10 text-left max-w-2xl">
             <h3 className="text-3xl md:text-4xl font-bold font-heading text-foreground mb-4 tracking-tight leading-none">
-              SportsRC Broadcast Arena
+              SportsFC Broadcast Arena
             </h3>
             <p className="text-xs md:text-sm text-muted-foreground/80 font-light mb-6">
               No live broadcasts scheduled at this moment. Stay tuned for upcoming analytical match blueprints.

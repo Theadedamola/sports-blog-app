@@ -1,11 +1,13 @@
 import { fetchMatches, fetchLiveMatches, fetchScheduledMatches } from "@/lib/api/fetchers";
+import { fetchBlogPosts } from "@/lib/api/blog-fetcher";
 import { HomeClient } from "./HomeClient";
 
 export default async function HomePage() {
-  const [allMatches, liveMatches, scheduledMatches] = await Promise.all([
+  const [allMatches, liveMatches, scheduledMatches, blogPosts] = await Promise.all([
     fetchMatches("football"),
     fetchLiveMatches(),
     fetchScheduledMatches(),
+    fetchBlogPosts(),
   ]);
 
   return (
@@ -13,6 +15,8 @@ export default async function HomePage() {
       allMatches={allMatches}
       liveMatches={liveMatches}
       scheduledMatches={scheduledMatches}
+      posts={blogPosts}
     />
   );
 }
+

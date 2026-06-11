@@ -69,7 +69,7 @@ export function MatchCard({ match, className }: MatchCardProps) {
                   isScheduled && "text-muted-foreground text-base"
                 )}
               >
-                {isScheduled ? "-" : match.score.home}
+                {isScheduled ? "-" : "-" }
               </span>
             </div>
 
@@ -86,7 +86,7 @@ export function MatchCard({ match, className }: MatchCardProps) {
                   isScheduled && "text-muted-foreground text-base"
                 )}
               >
-                {isScheduled ? "-" : match.score.away}
+                {isScheduled ? "-" : "-" }
               </span>
             </div>
           </div>

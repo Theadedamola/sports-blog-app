@@ -18,8 +18,8 @@ import {
   Plus,
   Settings,
   LogOut,
+  Database,
 } from "lucide-react";
-import { MOCK_MATCHES } from "@/lib/api/mock-data";
 import type { BlogPost } from "@/lib/api/blog-data";
 
 const container = {
@@ -51,6 +51,7 @@ export function AdminClient() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+  const [dbMode, setDbMode] = useState<"mongodb" | "fallback">("fallback");
 
   // Blog creation state
   const [title, setTitle] = useState("");
@@ -59,44 +60,96 @@ export function AdminClient() {
   const [category, setCategory] = useState("Tactics");
   const [readTime, setReadTime] = useState("5 min read");
   const [coverImage, setCoverImage] = useState(IMAGE_PRESETS[0].url);
-  const [authorName, setAuthorName] = useState("Marc Debusschere");
-  const [authorRole, setAuthorRole] = useState("Lead Tactical Analyst");
+  const [authorName, setAuthorName] = useState("Adedamola Alausa");
+  const [authorRole, setAuthorRole] = useState("Senior Football Analyst");
   const [authorAvatar, setAuthorAvatar] = useState(
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100&h=100"
+    "https://ui-avatars.com/api/?name=Adedamola+Alausa&background=0D1117&color=FCF1DA&bold=true&size=100&font-size=0.4"
   );
 
   const [customPosts, setCustomPosts] = useState<BlogPost[]>([]);
   const [successMessage, setSuccessMessage] = useState("");
+  const [stats, setStats] = useState<{
+    liveMatches: number;
+    activeStreams: number;
+    totalMatches: number;
+    totalArticles: number;
+    dbMode: "mongodb" | "fallback";
+  } | null>(null);
 
   const apiKeySet = !!process.env.NEXT_PUBLIC_HAS_API_KEY;
-  const liveCount = MOCK_MATCHES.filter((m) => m.status === "live").length;
-  const streamCount = MOCK_MATCHES.filter((m) => m.streamUrl).length;
 
   useEffect(() => {
     setIsMounted(true);
     setIsLoggedIn(sessionStorage.getItem("sportsrc_admin_auth") === "true");
     loadCustomPosts();
+    loadStats();
   }, []);
 
-  const loadCustomPosts = () => {
+  const loadStats = async () => {
+    try {
+      const res = await fetch("/api/admin/stats");
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data);
+        setDbMode(data.dbMode || "fallback");
+      }
+    } catch (e) {
+      console.error("Failed to load stats:", e);
+    }
+  };
+
+  const loadCustomPosts = async () => {
+    try {
+      const response = await fetch("/api/blog");
+      if (response.ok) {
+        const data = await response.json();
+        // Return only the non-seeded ones or all of them. The user wants to see all custom dynamic posts.
+        // We will filter out the 3 static ones from custom list display to avoid confusion, or display all. 
+        // Showing all is great since we can manage them.
+        setCustomPosts(data.posts || []);
+        setDbMode(data.mode || "fallback");
+      } else {
+        loadLocalStoragePosts();
+      }
+    } catch (e) {
+      console.error(e);
+      loadLocalStoragePosts();
+    }
+  };
+
+  const loadLocalStoragePosts = () => {
     try {
       const stored = localStorage.getItem("custom_blog_posts");
       if (stored) {
         setCustomPosts(JSON.parse(stored) as BlogPost[]);
       }
+      setDbMode("fallback");
     } catch (e) {
       console.error(e);
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username.trim() === "admin" && password.trim() === "admin") {
-      sessionStorage.setItem("sportsrc_admin_auth", "true");
-      setIsLoggedIn(true);
-      setAuthError("");
-    } else {
-      setAuthError("Invalid credentials. Please use admin / admin.");
+    setAuthError("");
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      const data = await response.json();
+      if (response.ok && data.success) {
+        sessionStorage.setItem("sportsrc_admin_auth", "true");
+        setIsLoggedIn(true);
+        setDbMode(data.mode || "fallback");
+        loadCustomPosts();
+      } else {
+        setAuthError(data.error || "Invalid credentials.");
+      }
+    } catch (err) {
+      setAuthError("Network error connecting to auth server.");
     }
   };
 
@@ -105,7 +158,7 @@ export function AdminClient() {
     setIsLoggedIn(false);
   };
 
-  const handlePublishPost = (e: React.FormEvent) => {
+  const handlePublishPost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !summary.trim() || !content.trim()) return;
 
@@ -136,13 +189,28 @@ export function AdminClient() {
     };
 
     try {
-      const existing = localStorage.getItem("custom_blog_posts");
-      const list = existing ? (JSON.parse(existing) as BlogPost[]) : [];
-      const updatedList = [newPost, ...list];
-      localStorage.setItem("custom_blog_posts", JSON.stringify(updatedList));
+      const response = await fetch("/api/blog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newPost),
+      });
 
-      setCustomPosts(updatedList);
-      setSuccessMessage("Blueprint article published successfully!");
+      if (response.ok) {
+        setSuccessMessage("Blueprint article published to MongoDB successfully!");
+        loadCustomPosts();
+      } else {
+        // Fallback to localStorage if API failed or returned fallback mode
+        const data = await response.json().catch(() => ({}));
+        
+        const existing = localStorage.getItem("custom_blog_posts");
+        const list = existing ? (JSON.parse(existing) as BlogPost[]) : [];
+        const updatedList = [newPost, ...list];
+        localStorage.setItem("custom_blog_posts", JSON.stringify(updatedList));
+
+        setCustomPosts(updatedList);
+        setSuccessMessage("Blueprint article published locally (Fallback Mode)!");
+      }
+
       setTitle("");
       setSummary("");
       setContent("");
@@ -154,14 +222,28 @@ export function AdminClient() {
     }
   };
 
-  const handleDeletePost = (id: string) => {
+  const handleDeletePost = async (id: string) => {
     try {
-      const existing = localStorage.getItem("custom_blog_posts");
-      if (existing) {
-        const list = JSON.parse(existing) as BlogPost[];
-        const filtered = list.filter((p) => p.id !== id);
-        localStorage.setItem("custom_blog_posts", JSON.stringify(filtered));
-        setCustomPosts(filtered);
+      const response = await fetch(`/api/blog/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setSuccessMessage("Blueprint article deleted successfully!");
+        setTimeout(() => setSuccessMessage(""), 4000);
+        loadCustomPosts();
+      } else {
+        // Fallback delete from local state/localStorage
+        const stored = localStorage.getItem("custom_blog_posts");
+        if (stored) {
+          const list = JSON.parse(stored) as BlogPost[];
+          const filtered = list.filter((p) => p.id !== id);
+          localStorage.setItem("custom_blog_posts", JSON.stringify(filtered));
+          setCustomPosts(filtered);
+        }
+        setSuccessMessage("Local blueprint article removed!");
+        setTimeout(() => setSuccessMessage(""), 4000);
+        loadCustomPosts();
       }
     } catch (e) {
       console.error(e);
@@ -236,8 +318,8 @@ export function AdminClient() {
             </button>
           </form>
 
-          <div className="mt-6 pt-4 border-t border-white/[0.04] text-[10px] text-muted-foreground/60 font-light">
-            Notice: Use default keys <code className="text-primary font-semibold">admin</code> / <code className="text-primary font-semibold">admin</code> to log in.
+          <div className="mt-6 pt-4 border-t border-white/4 text-[10px] text-muted-foreground/60 font-light">
+            Notice: Credentials verified securely against MongoDB when configured.
           </div>
         </motion.div>
       </div>
@@ -248,7 +330,7 @@ export function AdminClient() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header with Logout */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-white/[0.06] pb-6 text-left">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-white/6 pb-6 text-left">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded bg-primary/10 border border-primary/20 flex items-center justify-center">
             <Settings className="h-5 w-5 text-primary" />
@@ -279,16 +361,16 @@ export function AdminClient() {
       >
         {[
           {
-            title: "SportsRC API",
-            status: true,
-            value: "Connected",
-            icon: Server,
-            color: "text-primary",
-            bg: "bg-primary/10 border-primary/20",
+            title: "Database Mode",
+            status: dbMode === "mongodb",
+            value: dbMode === "mongodb" ? "MongoDB Live" : "Local Storage",
+            icon: Database,
+            color: dbMode === "mongodb" ? "text-primary" : "text-primary/75",
+            bg: dbMode === "mongodb" ? "bg-primary/10 border-primary/20" : "bg-white/[0.03] border-white/[0.08]",
           },
           {
             title: "OpenRouter AI",
-            status: false,
+            status: apiKeySet,
             value: apiKeySet ? "Active" : "No API Key",
             icon: Brain,
             color: apiKeySet ? "text-primary" : "text-primary/60",
@@ -296,16 +378,16 @@ export function AdminClient() {
           },
           {
             title: "Live Matches",
-            status: true,
-            value: `${liveCount} Active`,
+            status: (stats?.liveMatches ?? 0) > 0,
+            value: `${stats?.liveMatches ?? 0} Active`,
             icon: Activity,
             color: "text-live",
             bg: "bg-live/10 border-live/20",
           },
           {
             title: "Streams Available",
-            status: true,
-            value: `${streamCount} Active`,
+            status: (stats?.activeStreams ?? 0) > 0,
+            value: `${stats?.activeStreams ?? 0} Active`,
             icon: Zap,
             color: "text-primary",
             bg: "bg-primary/10 border-primary/20",
@@ -319,7 +401,7 @@ export function AdminClient() {
               {card.status ? (
                 <CheckCircle2 className="h-4 w-4 text-primary" />
               ) : (
-                <XCircle className="h-4 w-4 text-primary/60" />
+                <XCircle className="h-4 w-4 text-primary/65" />
               )}
             </div>
             <h3 className="text-sm font-semibold font-heading uppercase tracking-wider text-left">{card.title}</h3>
@@ -327,6 +409,7 @@ export function AdminClient() {
           </motion.div>
         ))}
       </motion.div>
+
 
       {/* Main Admin Features Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start text-left">
@@ -458,7 +541,7 @@ export function AdminClient() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/[0.04] pt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/4 pt-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 font-heading mb-1.5">
                     Author Name
@@ -533,7 +616,7 @@ export function AdminClient() {
             </div>
             
             {customPosts.length === 0 ? (
-              <p className="text-xs text-muted-foreground/80 font-light py-8 text-center border border-dashed border-white/[0.06] rounded bg-black/10">
+              <p className="text-xs text-muted-foreground/80 font-light py-8 text-center border border-dashed border-white/6 rounded bg-black/10">
                 No custom blueprint articles published yet. Publish your first article using the creator desk.
               </p>
             ) : (
@@ -541,7 +624,7 @@ export function AdminClient() {
                 {customPosts.map((post) => (
                   <div
                     key={post.id}
-                    className="p-3 rounded bg-white/[0.01] border border-white/[0.04] flex items-center justify-between gap-3 group"
+                    className="p-3 rounded bg-white/1 border border-white/4 flex items-center justify-between gap-3 group"
                   >
                     <div className="min-w-0 flex-1">
                       <h4 className="text-xs font-semibold text-foreground truncate font-heading">{post.title}</h4>
@@ -569,14 +652,14 @@ export function AdminClient() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: "Page Views", value: "3,142", icon: Eye, change: "+12%" },
-                { label: "AI Debate Queries", value: "198", icon: Brain, change: "+8%" },
-                { label: "Active Streams", value: `${liveCount}`, icon: Activity, change: "Live" },
-                { label: "Total Articles", value: `${3 + customPosts.length}`, icon: FilePlus, change: `+${customPosts.length}` },
+                { label: "Total Matches", value: `${stats?.totalMatches ?? 0}`, icon: Eye, change: "Tracked" },
+                { label: "Live Now", value: `${stats?.liveMatches ?? 0}`, icon: Activity, change: "Live" },
+                { label: "Active Streams", value: `${stats?.activeStreams ?? 0}`, icon: Zap, change: "Streaming" },
+                { label: "Total Articles", value: `${stats?.totalArticles ?? customPosts.length}`, icon: FilePlus, change: dbMode === "mongodb" ? "DB" : "Local" },
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="p-3 rounded bg-white/[0.01] border border-white/[0.04]"
+                  className="p-3 rounded bg-white/1 border border-white/4"
                 >
                   <stat.icon className="h-4 w-4 text-muted-foreground mb-2" />
                   <div className="text-lg font-bold tabular-nums font-heading">{stat.value}</div>

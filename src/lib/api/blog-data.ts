@@ -28,9 +28,9 @@ export const BLOG_POSTS: BlogPost[] = [
     summary: "How St Etienne refined their defensive low block and transitional play to challenge Nice in their latest thrilling encounter.",
     coverImage: "https://sportsrc.org/img/sport/proxy/GwZg7AZpYEZgHCAjAJgCzrAThFlBWSUYAUwVmDW2nmAmD32FrWGHXbeAENgBjUgg5sSdTtw5kAJqWCEImeuFFs8VFGA3wwfXJpDcQU3CBIGjFszCMFgSCn2Gz6GlSi5gy2+llnumtGCeYqIQQA.webp",
     author: {
-      name: "Marc Debusschere",
-      role: "Lead Tactical Analyst",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100&h=100",
+      name: "Adedamola Alausa",
+      role: "Senior Football Analyst",
+      avatar: "https://ui-avatars.com/api/?name=Adedamola+Alausa&background=0D1117&color=FCF1DA&bold=true&size=100&font-size=0.4",
     },
     content: `## A Tactical Masterclass in Transition
 
@@ -62,9 +62,9 @@ Ultimately, this match proved that tactical discipline and structured transition
     summary: "An in-depth analysis of the modern attacking systems used by top European managers to break down stubborn, highly compact defenses.",
     coverImage: "https://sportsrc.org/img/sport/proxy/GwZg7AZpYEZgHCAjAJgCzrAY29lBWSUYAUwVmDTAE5p5gJhqDh61hh1OPgBDYLKQRcOJBt15cyAE1LBCETI3BiOzdmOlgUYECB1IQvEFhN6Q0kCRAQz1xfmBIKWEXMY7VKHmDLwi1HLejvRgvuJiEEA.webp",
     author: {
-      name: "Elena Rostova",
-      role: "UEFA Pro Scout",
-      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=100&h=100",
+      name: "Adedamola Alausa",
+      role: "Senior Football Analyst",
+      avatar: "https://ui-avatars.com/api/?name=Adedamola+Alausa&background=0D1117&color=FCF1DA&bold=true&size=100&font-size=0.4",
     },
     content: `## The Modern Defensive Fortress
 
@@ -100,9 +100,9 @@ Ultimately, patience, spatial awareness, and high-frequency ball movement remain
     summary: "Breaking down how high-pressing systems rely on advanced wing-backs to trigger defensive traps and dictate the transition phase.",
     coverImage: "https://sportsrc.org/img/sport/poster/GwZg7AZpYEZgHCAjAJgCzuFgpsCwVgBDQhWYNMATkhQFZgrDh49g773hta1gATChUiNiwMOPQjcRLAnQgiIGCH4gmdcgwDGzcT3giq3Al1ZgwufFaA/GwZg7AZpYEZgHCAjAJgCzuFgpsCwVgBDQhWYNMATkhQFZgrDh49g773hta1gATChUiNiwMOPQjcRLAnQgqIZUoDG9cg3VZxPeCKrcCXVmDC58FoA.webp",
     author: {
-      name: "Arthur Pendelton",
-      role: "Performance Analyst",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100&h=100",
+      name: "Adedamola Alausa",
+      role: "Senior Football Analyst",
+      avatar: "https://ui-avatars.com/api/?name=Adedamola+Alausa&background=0D1117&color=FCF1DA&bold=true&size=100&font-size=0.4",
     },
     content: `## The Modern Engine: The Wing-Back
 

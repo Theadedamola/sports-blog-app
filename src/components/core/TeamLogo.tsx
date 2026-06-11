@@ -72,7 +72,7 @@ export function TeamLogo({ name, shortName, logo, size = "md", className }: Team
   return (
     <div
       className={cn(
-        "relative flex items-center justify-center rounded-full bg-gradient-to-br font-bold shadow-none",
+        "relative flex items-center justify-center rounded-full bg-linear-to-br font-bold shadow-none",
         gradient,
         sizeMap[size],
         className

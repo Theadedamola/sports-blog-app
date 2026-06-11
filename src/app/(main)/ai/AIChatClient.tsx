@@ -119,7 +119,7 @@ export function AIChatClient() {
               </div>
             </motion.div>
 
-            <h2 className="text-2xl font-bold mb-2 font-heading">SportsRC AI Analyst</h2>
+            <h2 className="text-2xl font-bold mb-2 font-heading">SportsFC AI Analyst</h2>
             <p className="text-sm text-muted-foreground max-w-md mb-8">
               Ask me about live match stats, head-to-head records, tournament lineups,
               and team forms. I analyze live match data to give you real-time insights.
@@ -215,7 +215,7 @@ export function AIChatClient() {
               onKeyDown={handleKeyDown}
               placeholder="Ask about live scores, team forms, head-to-head records..."
               rows={1}
-              className="w-full resize-none rounded bg-white/[0.03] border border-white/[0.08] px-4 py-3 pr-12 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/30 focus:ring-1 focus:ring-primary/20 transition-all font-sans text-foreground"
+              className="w-full resize-none rounded bg-white/3 border border-white/8 px-4 py-3 pr-12 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/30 focus:ring-1 focus:ring-primary/20 transition-all font-sans text-foreground"
               style={{ minHeight: "44px", maxHeight: "120px" }}
             />
             <div className="absolute right-2 bottom-2">
@@ -229,7 +229,7 @@ export function AIChatClient() {
               "h-11 w-11 rounded flex items-center justify-center transition-all shrink-0",
               input.trim() && !isLoading
                 ? "bg-primary text-background hover:bg-primary/90"
-                : "bg-white/[0.05] text-muted-foreground cursor-not-allowed"
+                : "bg-white/5 text-muted-foreground cursor-not-allowed"
             )}
           >
             <Send className="h-4 w-4" />

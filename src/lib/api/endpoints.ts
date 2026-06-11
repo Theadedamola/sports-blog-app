@@ -1,4 +1,4 @@
-// SportsRC API endpoint builders
+// SportsFC API endpoint builders
 
 export const ENDPOINTS = {
   sports: () => ({ data: "sports" }),

@@ -35,22 +35,44 @@ export function BlogDetailClient({ initialPost, postId }: BlogDetailClientProps)
 
   useEffect(() => {
     if (!initialPost) {
-      try {
-        const stored = localStorage.getItem("custom_blog_posts");
-        if (stored) {
-          const custom = JSON.parse(stored) as BlogPost[];
-          const found = custom.find((p) => p.id === postId);
-          if (found) {
-            setPost(found);
+      const loadPost = async () => {
+        try {
+          const response = await fetch(`/api/blog/${postId}`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.post) {
+              setPost(data.post);
+              return;
+            }
           }
+          loadLocalFallback();
+        } catch (e) {
+          console.error("Error loading blog post dynamically:", e);
+          loadLocalFallback();
         }
-      } catch (e) {
-        console.error("Error reading custom blog post", e);
-      }
+      };
+
+      const loadLocalFallback = () => {
+        try {
+          const stored = localStorage.getItem("custom_blog_posts");
+          if (stored) {
+            const custom = JSON.parse(stored) as BlogPost[];
+            const found = custom.find((p) => p.id === postId || p.slug === postId);
+            if (found) {
+              setPost(found);
+            }
+          }
+        } catch (e) {
+          console.error("Error reading custom blog post from local storage:", e);
+        }
+      };
+
+      loadPost();
     } else {
       setPost(initialPost);
     }
   }, [initialPost, postId]);
+
 
   // Scroll to bottom of chat
   useEffect(() => {

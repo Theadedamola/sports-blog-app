@@ -4,11 +4,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "SportsRC — Live Football Streaming & Match Day",
-    template: "%s | SportsRC",
+    default: "SportsFC — Live Football Streaming & Match Day",
+    template: "%s | SportsFC",
   },
   description:
-    "Watch SportsRC live sports, stream matches, and converse with the AI Tournament Analyst.",
+    "Watch SportsFC live sports, stream matches, and converse with the AI Tournament Analyst.",
   keywords: [
     "live football streaming",
     "sports results",
@@ -17,9 +17,9 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: "website",
-    title: "SportsRC — Live Football Streaming & Match Day",
-    description: "Watch live sports streams and get premium match analysis with SportsRC AI.",
-    siteName: "SportsRC",
+    title: "SportsFC — Live Football Streaming & Match Day",
+    description: "Watch live sports streams and get premium match analysis with SportsFC AI.",
+    siteName: "SportsFC",
   },
   robots: {
     index: true,
@@ -45,7 +45,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
+      <body
+        suppressHydrationWarning
+        className="min-h-full flex flex-col bg-background font-sans text-foreground"
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

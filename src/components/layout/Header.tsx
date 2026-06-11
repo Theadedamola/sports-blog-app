@@ -49,7 +49,7 @@ export function Header() {
                     "relative flex items-center gap-2 px-4 py-2 rounded text-sm font-medium transition-colors",
                     isActive
                       ? "text-primary font-semibold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-white/[0.02]"
+                      : "text-muted-foreground hover:text-foreground hover:bg-white/2"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -71,7 +71,7 @@ export function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-2">
-            <button className="p-2 rounded text-muted-foreground hover:text-foreground hover:bg-white/[0.02] transition-colors">
+            <button className="p-2 rounded text-muted-foreground hover:text-foreground hover:bg-white/2 transition-colors">
               <Search className="h-4.5 w-4.5" />
             </button>
           </div>

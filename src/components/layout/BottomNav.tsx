@@ -17,7 +17,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-50 md:hidden glass-strong border-t border-white/[0.06]">
+    <nav className="fixed bottom-0 inset-x-0 z-50 md:hidden glass-strong border-t border-white/6">
       <div className="flex items-center justify-around py-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))]">
         {navItems.map((item) => {
           const Icon = item.icon;
