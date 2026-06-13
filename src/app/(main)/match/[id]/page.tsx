@@ -3,6 +3,8 @@ import { fetchMatchDetail } from "@/lib/api/fetchers";
 import { MatchDetailClient } from "@/app/(main)/match/[id]/MatchDetailClient";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 interface MatchPageProps {
   params: Promise<{ id: string }>;
 }

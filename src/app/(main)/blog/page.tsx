@@ -3,6 +3,8 @@ import { BlogClient } from "./BlogClient";
 import { fetchLiveMatches, fetchScheduledMatches } from "@/lib/api/fetchers";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Sports Blog",
   description: "Latest football tactical reviews, scouts analysis, and performance breakdowns.",
