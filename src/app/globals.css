@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Stack+Sans+Notch:wght@200..700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -13,7 +12,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "DM Sans", sans-serif;
+  --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: "Stack Sans Notch", sans-serif;
   --font-mono: var(--font-geist-mono);
 
@@ -125,6 +124,17 @@
   --loss: #ff3b52;
 }
 
+/* ── Universal / Smart TV Core Base Fallbacks (outside @layer) ── */
+html,
+body {
+  background-color: #0c1a12;
+  color: #fcf1da;
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
 /* ── Keyframe Animations ───────────────────── */
 @keyframes pulse-live {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -163,7 +173,7 @@
     scroll-behavior: smooth;
   }
   h1, h2, h3, h4, h5, h6, .font-heading {
-    font-family: "Stack Sans Notch", sans-serif !important;
+    font-family: "Stack Sans Notch", -apple-system, BlinkMacSystemFont, sans-serif !important;
   }
 
   /* Custom scrollbar */
@@ -183,91 +193,91 @@
   }
 }
 
-/* ── Utility Classes ───────────────────────── */
-@layer utilities {
-  .glass {
-    background: rgba(12, 26, 18, 0.85);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(252, 241, 218, 0.05);
-  }
+/* ── Utility Classes & Smart TV Fallbacks ───────────────────────── */
+.glass {
+  background: rgba(12, 26, 18, 0.85);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(252, 241, 218, 0.05);
+}
 
-  .glass-card {
-    background: #0c1a12;
-    border: 1px solid #374151;
-    border-radius: var(--radius);
-  }
+.glass-card {
+  background: #0c1a12;
+  border: 1px solid #374151;
+  border-radius: var(--radius, 8px);
+}
 
-  .glass-strong {
-    background: rgba(12, 26, 18, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(252, 241, 218, 0.08);
-  }
+.glass-strong {
+  background: rgba(12, 26, 18, 0.95);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(252, 241, 218, 0.08);
+}
 
-  .glow-neon {
-    border-color: #374151;
-  }
+.glow-neon {
+  border-color: #374151;
+}
 
-  .glow-electric {
-    border-color: #374151;
-  }
+.glow-electric {
+  border-color: #374151;
+}
 
-  .text-glow-neon {
-    text-shadow: none;
-  }
+.text-glow-neon {
+  text-shadow: none;
+}
 
-  .text-glow-electric {
-    text-shadow: none;
-  }
+.text-glow-electric {
+  text-shadow: none;
+}
 
-  .animate-pulse-live {
-    animation: pulse-live 2s ease-in-out infinite;
-  }
+.animate-pulse-live {
+  animation: pulse-live 2s ease-in-out infinite;
+}
 
-  .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(252, 241, 218, 0.03) 50%,
-      transparent 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2.5s linear infinite;
-  }
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(252, 241, 218, 0.03) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.5s linear infinite;
+}
 
-  .animate-slide-up {
-    animation: slide-up 0.4s ease-out forwards;
-  }
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
 
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
 
-  .animate-ticker {
-    animation: ticker-scroll 35s linear infinite;
-  }
+.animate-ticker {
+  animation: ticker-scroll 35s linear infinite;
+}
 
-  .gradient-neon {
-    background: #fcf1da;
-  }
+.gradient-neon {
+  background: #fcf1da;
+}
 
-  .gradient-surface {
-    background: #0c1a12;
-  }
+.gradient-surface {
+  background: #0c1a12;
+}
 
-  .gradient-hero {
-    background: linear-gradient(
-      180deg,
-      rgba(252, 241, 218, 0.05) 0%,
-      transparent 100%
-    );
-  }
+.gradient-hero {
+  background: linear-gradient(
+    180deg,
+    rgba(252, 241, 218, 0.05) 0%,
+    transparent 100%
+  );
+}
 
-  /* Hide scrollbar but allow scrolling */
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
+/* Hide scrollbar but allow scrolling */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
